@@ -1,3 +1,4 @@
+import initTags from "./mtpt/initTags";
 import { connectMqtt } from "./server/connect";
 const showcase = document.getElementById('showcase') as HTMLIFrameElement;
 const spaceId = process.env.MP_SPACE_ID;
@@ -16,7 +17,8 @@ declare global {
 }
 showcase.addEventListener('load', async function() {
   try {
-    await showcaseWindow.MP_SDK.connect(showcase, key, '3.6')
+    const sdk = await showcaseWindow.MP_SDK.connect(showcase, key, '3.6')
+    initTags(sdk);
     showcase.contentWindow.postMessage('hello from parent','*')
     connectMqtt();
   }
