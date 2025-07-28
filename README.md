@@ -68,12 +68,7 @@ SDK를 연동하기 위해 `index.html`과 `src/index.ts` 파일을 수정해야
     <body>
       <h1>Matterport SDK Sample</h1>
       <!-- Matterport 모델이 표시될 컨테이너 -->
-      <div id="showcase-container" style="width: 800px; height: 600px;"></div>
-
-      <!-- Matterport SDK 스크립트 -->
-      <script src="./bundle/sdk.js"></script>
-      <!-- Webpack으로 번들링된 애플리케이션 스크립트 -->
-      <script src="./dist/main.js"></script>
+      <iframe id="showcase" style="width: 800px; height: 600px;"></iframe>
     </body>
     </html>
     ```
@@ -83,37 +78,41 @@ SDK를 연동하기 위해 `index.html`과 `src/index.ts` 파일을 수정해야
     `src/index.ts` 파일에서 SDK를 초기화하는 코드를 작성합니다.
 
     ```typescript
-    // SDK가 window 객체에 MP_SDK로 할당되므로, any 타입으로 캐스팅하여 사용합니다.
-    declare const window: any;
-
     // Matterport 모델을 표시할 HTML 요소를 가져옵니다.
-    const showcase = document.getElementById('showcase-container');
+    const showcase = document.getElementById('showcase');
 
     // 본인의 Matterport 애플리케이션 키로 교체해야 합니다.
-    const applicationKey = 'YOUR_APPLICATION_KEY';
+    const key = 'YOUR_APPLICATION_KEY';
 
     // 연동하려는 Matterport 모델의 SID로 교체해야 합니다.
-    const modelSid = 'YOUR_MODEL_SID';
+    const spaceId = 'YOUR_MODEL_SID';
+
+    showcase.src = `bundle/showcase.html?m=${spaceId}&play=1&qs=1&log=0&applicationKey=${key}`;
+    const showcaseWindow = showcase.contentWindow;
+
+    // SDK가 window 객체에 MP_SDK로 할당되므로, any 타입으로 캐스팅하여 사용합니다.
+    declare global {
+      interface Window {
+        MP_SDK: any;
+      }
+    }
+    // declare this file is a module
+    export {};
 
     // SDK와 연결합니다.
+    showcase.addEventListener('load', async function() {
     try {
-      window.MP_SDK.connect(showcase, {
-        applicationKey: applicationKey,
-        m: modelSid,
-      })
-      .then((sdk: any) => {
-        console.log('Matterport SDK Connected!', sdk);
-        // SDK 로드 성공 후 실행할 코드를 여기에 작성하세요.
-      })
-      .catch((error: any) => {
-        console.error('Failed to connect to Matterport SDK:', error);
-      });
-    } catch (e) {
-      console.error(e);
+      await showcaseWindow.MP_SDK.connect(showcase, key, '3.6')
+      showcase.contentWindow.postMessage('hello from parent','*')
     }
+    catch(e) {
+      console.error(e);
+      return;
+    }
+    })
     ```
 
-    **중요**: 위 코드에서 `YOUR_APPLICATION_KEY`와 `YOUR_MODEL_SID`를 본인의 값으로 반드시 교체해야 합니다.
+    **중요**: 위 코드에서 `key`와 `spaceId`를 본인의 값으로 반드시 교체해야 합니다.
 
 ## 📂 주요 파일 구조
 
