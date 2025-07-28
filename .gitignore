@@ -108,5 +108,3 @@ key.pem
 csr.pem
 
 .DS_Store
-bundle.tar.gz
-bundle
