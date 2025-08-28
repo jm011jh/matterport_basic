@@ -83,3 +83,11 @@ export function publishMessage(topic: string, payload: string) {
         console.log('클라이언트가 연결되지 않았습니다. 발행할 수 없습니다.');
     }
 }
+
+
+const sendButton = document.getElementById('mqtt_send_button');
+sendButton.addEventListener('click', () => {
+    const topic = document.getElementById('mqtt_send_topic') as HTMLInputElement;
+    const message = document.getElementById('mqtt_send_message') as HTMLInputElement;
+    publishMessage(topic.value, message.value);
+})
